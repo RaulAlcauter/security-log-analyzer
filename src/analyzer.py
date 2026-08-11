@@ -1,5 +1,5 @@
-from detectors import detect_brute_force, detect_sql_injection
-from parser import parse_auth_log, parse_access_log
+from detectors import run_all_detectors
+from parser import parse_access_log, parse_auth_log
 
 
 def load_auth_events(filename):
@@ -12,7 +12,7 @@ def load_auth_events(filename):
                 events.append(event)
 
             except ValueError as error:
-                print(f"[WARNING] Line {line_number}: {error}")
+                print(f"[WARNING] Auth log line {line_number}: {error}")
 
     return events
 
@@ -26,14 +26,18 @@ def load_access_events(filename):
                 events.append(event)
 
             except ValueError as error:
-                print(f"[WARNING] Line {line_number}: {error}")
+                print(f"[WARNING] Access log line {line_number}: {error}")
 
     return events
 
 if __name__ == "__main__":
-    events = load_access_events("logs/access.log")
+    access_events = load_access_events("logs/access.log")
+    auth_events = load_auth_events("logs/auth.log")
 
-    alerts = detect_sql_injection(events)
+    access_alerts = run_all_detectors(access_events)
+    auth_alerts = run_all_detectors(auth_events)
+
+    alerts = access_alerts + auth_alerts
 
     for alert in alerts:
         print(alert)

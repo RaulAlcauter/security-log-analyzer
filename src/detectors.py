@@ -7,7 +7,7 @@ def detect_brute_force(events, threshold=10, window_seconds=60):
     failures_by_ip = defaultdict(list)
 
     for event in events:
-        if event["event_type"] == "LOGIN_FAILURE":
+        if event["type"] == "AUTH" and event["event"] == "LOGIN_FAILURE":
             failures_by_ip[event["source_ip"]].append(event)
 
     alerts = []
@@ -52,6 +52,9 @@ def detect_sql_injection(events):
     alerts = []
 
     for event in events:
+        if event["type"] != "WEB":
+            continue
+        
         if "path" not in event:
             continue
 
@@ -67,5 +70,13 @@ def detect_sql_injection(events):
                     "pattern": pattern
                 })
                 break
+
+    return alerts
+
+def run_all_detectors(events):
+    alerts = []
+
+    alerts.extend(detect_brute_force(events))
+    alerts.extend(detect_sql_injection(events))
 
     return alerts

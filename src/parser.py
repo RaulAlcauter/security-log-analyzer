@@ -9,6 +9,7 @@ def parse_access_log(line):
     timestamp, source_ip, method, path, status = parts
 
     return {
+        "type": "WEB",
         "timestamp": datetime.fromisoformat(timestamp),
         "source_ip": source_ip,
         "method": method,
@@ -42,9 +43,10 @@ def parse_auth_log(line):
         raise ValueError(f"Unknown authentication event: {event_type}")
 
     return {
+        "type": "AUTH",
         "timestamp": datetime.fromisoformat(timestamp),
         "source_ip": source_ip,
-        "event_type": event_type,
+        "event": event_type,
         "username": username
     }
 
