@@ -49,29 +49,11 @@ def detect_sql_injection(events):
         r"\bbenchmark\s*\("
     ]
 
-    alerts = []
-
-    for event in events:
-        if event["type"] != "WEB":
-            continue
-
-        if "path" not in event:
-            continue
-
-        decoded_path = unquote(event["path"])
-
-        for pattern in sql_patterns:
-            if re.search(pattern, decoded_path, re.IGNORECASE):
-                alerts.append({
-                    "type": "SQL_INJECTION",
-                    "severity": "HIGH",
-                    "source_ip": event["source_ip"],
-                    "path": event["path"],
-                    "pattern": pattern
-                })
-                break
-
-    return alerts
+    return detect_web_patterns(
+        events,
+        sql_patterns,
+        "SQL_INJECTION"
+    )
 
 def detect_xss(events):
     xss_patterns = [
@@ -83,6 +65,28 @@ def detect_xss(events):
         r"\bonload\s*="
     ]
 
+    return detect_web_patterns(
+        events,
+        xss_patterns,
+        "XSS"
+    )
+
+def detect_path_traversal(events):
+    traversal_patterns = [
+        r"\.\./",
+        r"\.\.\\",
+        r"/etc/passwd",
+        r"/etc/shadow",
+        r"windows/system32"
+    ]
+
+    return detect_web_patterns(
+        events,
+        traversal_patterns,
+        "PATH_TRAVERSAL"
+    )
+
+def detect_web_patterns(events, patterns, alert_type, severity="HIGH"):
     alerts = []
 
     for event in events:
@@ -91,11 +95,11 @@ def detect_xss(events):
 
         decoded_path = unquote(event["path"])
 
-        for pattern in xss_patterns:
+        for pattern in patterns:
             if re.search(pattern, decoded_path, re.IGNORECASE):
                 alerts.append({
-                    "type": "XSS",
-                    "severity": "HIGH",
+                    "type": alert_type,
+                    "severity": severity,
                     "source_ip": event["source_ip"],
                     "path": event["path"],
                     "pattern": pattern
@@ -110,5 +114,6 @@ def run_all_detectors(events):
     alerts.extend(detect_brute_force(events))
     alerts.extend(detect_sql_injection(events))
     alerts.extend(detect_xss(events))
+    alerts.extend(detect_path_traversal(events))
 
     return alerts

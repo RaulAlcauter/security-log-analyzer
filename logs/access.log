@@ -11,3 +11,6 @@
 2026-08-10T10:21:01 192.168.1.35 GET /search?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E 200
 2026-08-10T10:21:05 192.168.1.36 GET /profile?name=%3Cimg%20src%3Dx%20onerror%3Dalert(1)%3E 200
 2026-08-10T10:21:10 192.168.1.37 GET /search?q=hello+world 200
+2026-08-10T10:22:01 192.168.1.40 GET /download?file=../../../../etc/passwd 403
+2026-08-10T10:22:05 192.168.1.41 GET /download?file=..%2F..%2F..%2F..%2Fetc%2Fpasswd 403
+2026-08-10T10:22:10 192.168.1.42 GET /download?file=report.pdf 200
