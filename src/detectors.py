@@ -54,7 +54,7 @@ def detect_sql_injection(events):
     for event in events:
         if event["type"] != "WEB":
             continue
-        
+
         if "path" not in event:
             continue
 
@@ -73,10 +73,42 @@ def detect_sql_injection(events):
 
     return alerts
 
+def detect_xss(events):
+    xss_patterns = [
+        r"<\s*script\b",
+        r"javascript\s*:",
+        r"<\s*iframe\b",
+        r"<\s*object\b",
+        r"\bonerror\s*=",
+        r"\bonload\s*="
+    ]
+
+    alerts = []
+
+    for event in events:
+        if event["type"] != "WEB":
+            continue
+
+        decoded_path = unquote(event["path"])
+
+        for pattern in xss_patterns:
+            if re.search(pattern, decoded_path, re.IGNORECASE):
+                alerts.append({
+                    "type": "XSS",
+                    "severity": "HIGH",
+                    "source_ip": event["source_ip"],
+                    "path": event["path"],
+                    "pattern": pattern
+                })
+                break
+
+    return alerts
+
 def run_all_detectors(events):
     alerts = []
 
     alerts.extend(detect_brute_force(events))
     alerts.extend(detect_sql_injection(events))
+    alerts.extend(detect_xss(events))
 
     return alerts
