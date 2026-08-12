@@ -108,10 +108,18 @@ def detect_web_patterns(events, patterns, alert_type, severity="HIGH"):
 
     return alerts
 
-def run_all_detectors(events):
+def run_all_detectors(events, config):
     alerts = []
 
-    alerts.extend(detect_brute_force(events))
+    brute_force_config = config["brute_force"]
+
+    alerts.extend(
+        detect_brute_force(
+            events,
+            threshold=brute_force_config["threshold"],
+            window_seconds=brute_force_config["window_seconds"]
+        )
+    )
     alerts.extend(detect_sql_injection(events))
     alerts.extend(detect_xss(events))
     alerts.extend(detect_path_traversal(events))

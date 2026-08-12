@@ -1,6 +1,7 @@
 from detectors import run_all_detectors
 from parser import parse_access_log, parse_auth_log
 from reporter import print_alerts
+from config import load_config
 
 def load_auth_events(filename):
     events = []
@@ -34,8 +35,10 @@ if __name__ == "__main__":
     access_events = load_access_events("logs/access.log")
     auth_events = load_auth_events("logs/auth.log")
 
-    access_alerts = run_all_detectors(access_events)
-    auth_alerts = run_all_detectors(auth_events)
+    config = load_config("config/rules.json")
+
+    access_alerts = run_all_detectors(access_events, config)
+    auth_alerts = run_all_detectors(auth_events, config)
 
     alerts = access_alerts + auth_alerts
 

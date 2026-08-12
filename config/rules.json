@@ -1,0 +1,6 @@
+{
+    "brute_force": {
+        "threshold": 10,
+        "window_seconds": 60
+    }
+}
