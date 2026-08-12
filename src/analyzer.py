@@ -1,6 +1,6 @@
 from detectors import run_all_detectors
 from parser import parse_access_log, parse_auth_log
-
+from reporter import print_alerts
 
 def load_auth_events(filename):
     events = []
@@ -39,5 +39,4 @@ if __name__ == "__main__":
 
     alerts = access_alerts + auth_alerts
 
-    for alert in alerts:
-        print(alert)
+    print_alerts(alerts)
