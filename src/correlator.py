@@ -33,12 +33,19 @@ def correlate_alerts(alerts, window_seconds=300):
             }
 
             if len(alert_types) >= 2:
+                first_seen = alerts_in_window[0]["timestamp"]
+                last_seen = alerts_in_window[-1]["timestamp"]
+
                 correlated_alerts.append({
                     "type": "ATTACK_CAMPAIGN",
                     "severity": "CRITICAL",
                     "source_ip": source_ip,
-                    "timestamp": window_start,
-                    "related_alerts": list(alert_types)
+                    "first_seen": first_seen,
+                    "last_seen": last_seen,
+                    "duration_seconds": (
+                        last_seen - first_seen
+                    ).total_seconds(),
+                    "related_alerts": alerts_in_window
                 })
 
                 break

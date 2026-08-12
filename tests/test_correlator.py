@@ -30,6 +30,25 @@ class TestCorrelator(unittest.TestCase):
         self.assertEqual(len(correlated), 1)
         self.assertEqual(correlated[0]["type"], "ATTACK_CAMPAIGN")
         self.assertEqual(correlated[0]["source_ip"], "10.10.10.60")
+        self.assertEqual(
+            correlated[0]["first_seen"],
+            timestamp
+        )
+
+        self.assertEqual(
+            correlated[0]["last_seen"],
+            timestamp + timedelta(seconds=10)
+        )
+
+        self.assertEqual(
+            correlated[0]["duration_seconds"],
+            10
+        )
+
+        self.assertEqual(
+            len(correlated[0]["related_alerts"]),
+            2
+        )
 
     def test_does_not_correlate_different_ips(self):
         timestamp = datetime(2026, 8, 10, 10, 0, 0)
