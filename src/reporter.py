@@ -1,3 +1,5 @@
+import json
+
 def print_alerts(alerts):
     print("=" * 60)
     print("SECURITY LOG ANALYZER")
@@ -26,3 +28,6 @@ def print_alerts(alerts):
         print("-" * 60)
 
     print(f"\nTotal alerts: {len(alerts)}")
+
+def print_alerts_json(alerts):
+    print(json.dumps(alerts, indent=4, default=str))
