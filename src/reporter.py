@@ -19,7 +19,8 @@ def print_alerts(alerts):
             print(f"First seen: {alert['first_seen']}")
             print(f"Last seen : {alert['last_seen']}")
             print(f"Duration  : {alert['duration_seconds']} seconds")
-
+            print(f"Risk score: {alert['risk_score']}")
+            
             print("Related alerts:")
 
             for related_alert in alert["related_alerts"]:

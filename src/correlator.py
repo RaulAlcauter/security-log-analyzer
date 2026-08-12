@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from risk import calculate_campaign_score, calculate_campaign_severity
 
 def correlate_alerts(alerts, window_seconds=300):
     alerts_by_ip = {}
@@ -35,8 +35,7 @@ def correlate_alerts(alerts, window_seconds=300):
             if len(alert_types) >= 2:
                 first_seen = alerts_in_window[0]["timestamp"]
                 last_seen = alerts_in_window[-1]["timestamp"]
-
-                correlated_alerts.append({
+                campaign = {
                     "type": "ATTACK_CAMPAIGN",
                     "severity": "CRITICAL",
                     "source_ip": source_ip,
@@ -46,8 +45,14 @@ def correlate_alerts(alerts, window_seconds=300):
                         last_seen - first_seen
                     ).total_seconds(),
                     "related_alerts": alerts_in_window
-                })
+                }
 
+                campaign_score = calculate_campaign_score(campaign)
+                campaign["risk_score"] = campaign_score
+                campaign["severity"] = calculate_campaign_severity(campaign_score)
+
+                correlated_alerts.append(campaign)
+                
                 break
 
     return correlated_alerts
