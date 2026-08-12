@@ -14,3 +14,6 @@
 2026-08-10T10:22:01 192.168.1.40 GET /download?file=../../../../etc/passwd 403
 2026-08-10T10:22:05 192.168.1.41 GET /download?file=..%2F..%2F..%2F..%2Fetc%2Fpasswd 403
 2026-08-10T10:22:10 192.168.1.42 GET /download?file=report.pdf 200
+2026-08-10T10:25:01 10.10.10.60 GET /admin 401
+2026-08-10T10:25:05 10.10.10.60 GET /products?id=1%27%20OR%20%271%27%3D%271 200
+2026-08-10T10:25:10 10.10.10.60 GET /search?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E 200

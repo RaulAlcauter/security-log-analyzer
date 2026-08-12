@@ -25,6 +25,11 @@ def print_alerts(alerts):
         if "pattern" in alert:
             print(f"Pattern   : {alert['pattern']}")
 
+        if "related_alerts" in alert:
+            print("Related alerts:")
+            for related_alert in alert["related_alerts"]:
+                print(f"  - {related_alert}")
+
         print("-" * 60)
 
     print(f"\nTotal alerts: {len(alerts)}")

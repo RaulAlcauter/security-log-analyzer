@@ -30,6 +30,7 @@ def detect_brute_force(events, threshold=10, window_seconds=60):
                     "type": "BRUTE_FORCE",
                     "severity": "HIGH",
                     "source_ip": source_ip,
+                    "timestamp": failures[i]["timestamp"],
                     "failed_attempts": len(failures_in_window),
                     "window_seconds": window_seconds
                 })
@@ -102,7 +103,8 @@ def detect_web_patterns(events, patterns, alert_type, severity="HIGH"):
                     "severity": severity,
                     "source_ip": event["source_ip"],
                     "path": event["path"],
-                    "pattern": pattern
+                    "pattern": pattern,
+                    "timestamp": event["timestamp"]
                 })
                 break
 

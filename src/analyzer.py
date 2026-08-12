@@ -3,6 +3,7 @@ from parser import parse_access_log, parse_auth_log
 from reporter import print_alerts, print_alerts_json
 from config import load_config
 import argparse
+from correlator import correlate_alerts
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -76,6 +77,10 @@ if __name__ == "__main__":
     auth_alerts = run_all_detectors(auth_events, config)
 
     alerts = access_alerts + auth_alerts
+
+    correlation_alerts = correlate_alerts(alerts)
+
+    alerts.extend(correlation_alerts)
 
     if args.format == "json":
         print_alerts_json(alerts)
