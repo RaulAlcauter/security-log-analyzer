@@ -3,6 +3,19 @@ from datetime import timedelta
 import re 
 from urllib.parse import unquote
 
+def normalize_url(value, max_decodes=3):
+    current = value
+
+    for _ in range(max_decodes):
+        decoded = unquote(current)
+
+        if decoded == current:
+            break
+
+        current = decoded
+
+    return current
+
 def detect_brute_force(events, threshold=10, window_seconds=60):
     failures_by_ip = defaultdict(list)
 
@@ -94,7 +107,7 @@ def detect_web_patterns(events, patterns, alert_type, severity="HIGH"):
         if event["type"] != "WEB":
             continue
 
-        decoded_path = unquote(event["path"])
+        decoded_path = normalize_url(event["path"])
 
         for pattern in patterns:
             if re.search(pattern, decoded_path, re.IGNORECASE):
