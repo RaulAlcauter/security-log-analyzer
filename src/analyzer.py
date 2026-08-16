@@ -1,6 +1,6 @@
 from detectors import run_all_detectors
 from parser import parse_access_log, parse_auth_log
-from reporter import print_alerts, print_alerts_json
+from reporter import print_alerts, print_alerts_json, print_summary
 from config import load_config
 import argparse
 from correlator import correlate_alerts
@@ -34,6 +34,12 @@ def parse_arguments():
         choices=["text", "json"],
         default="text",
         help="Output format."
+    )
+
+    parser.add_argument(
+        "--summary",
+        action="store_true",
+        help="Show a summary of detected alerts."
     )
 
     return parser.parse_args()
@@ -88,5 +94,7 @@ if __name__ == "__main__":
 
     if args.format == "json":
         print_alerts_json(alerts)
+    elif args.summary:
+        print_summary(alerts)
     else:
         print_alerts(alerts)

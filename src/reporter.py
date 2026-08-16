@@ -1,4 +1,5 @@
 import json
+from collections import Counter
 
 def print_alerts(alerts):
     print("=" * 60)
@@ -49,7 +50,7 @@ def print_alerts(alerts):
             print("Related alerts:")
             for related_alert in alert["related_alerts"]:
                 print(f"  - {related_alert}")
-                
+
         if "mitre" in alert:
             mitre = alert["mitre"]
 
@@ -61,6 +62,48 @@ def print_alerts(alerts):
         print("-" * 60)
 
     print(f"\nTotal alerts: {len(alerts)}")
+
+def print_summary(alerts):
+        severity_counts = Counter(
+            alert["severity"]
+            for alert in alerts
+        )
+
+        type_counts = Counter(
+            alert["type"]
+            for alert in alerts
+        )
+
+        ip_counts = Counter(
+            alert["source_ip"]
+            for alert in alerts
+        )
+
+        print()
+        print("=" * 60)
+        print("SECURITY SUMMARY")
+        print("=" * 60)
+
+        print()
+        print(f"Total alerts : {len(alerts)}")
+        print(f"Critical     : {severity_counts.get('CRITICAL', 0)}")
+        print(f"High         : {severity_counts.get('HIGH', 0)}")
+        print(f"Medium       : {severity_counts.get('MEDIUM', 0)}")
+        print(f"Low          : {severity_counts.get('LOW', 0)}")
+
+        print()
+        print("By type:")
+
+        for alert_type, count in type_counts.most_common():
+            print(f"  {alert_type:<20}: {count}")
+
+        print()
+        print("Top source IPs:")
+
+        for source_ip, count in ip_counts.most_common(5):
+            print(f"  {source_ip:<20}: {count}")
+
+        print("=" * 60)
 
 def print_alerts_json(alerts):
     print(json.dumps(alerts, indent=4, default=str))
