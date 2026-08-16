@@ -49,6 +49,14 @@ def print_alerts(alerts):
             print("Related alerts:")
             for related_alert in alert["related_alerts"]:
                 print(f"  - {related_alert}")
+                
+        if "mitre" in alert:
+            mitre = alert["mitre"]
+
+            print("MITRE ATT&CK:")
+            print(f"  Technique : {mitre['technique_id']} - {mitre['technique']}")
+            print(f"  Tactic    : {mitre['tactic']}")
+            print(f"  Confidence: {mitre['confidence']}")
 
         print("-" * 60)
 

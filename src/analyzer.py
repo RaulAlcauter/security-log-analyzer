@@ -4,6 +4,7 @@ from reporter import print_alerts, print_alerts_json
 from config import load_config
 import argparse
 from correlator import correlate_alerts
+from mitre import add_mitre_mapping
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -77,6 +78,9 @@ if __name__ == "__main__":
     auth_alerts = run_all_detectors(auth_events, config)
 
     alerts = access_alerts + auth_alerts
+
+    for alert in alerts:
+        add_mitre_mapping(alert)
 
     correlation_alerts = correlate_alerts(alerts)
 
