@@ -299,5 +299,116 @@ class TestDetectors(unittest.TestCase):
 
         self.assertEqual(result, "%27")
 
+    def test_xss_case_insensitive(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.54",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/search?q=%3CSCRIPT%3Ealert(1)%3C%2FSCRIPT%3E",
+        }
+
+        alerts = detect_xss([event])
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["type"], "XSS")
+        self.assertEqual(alerts[0]["severity"], "HIGH")
+        self.assertEqual(alerts[0]["source_ip"], "192.168.1.54")
+
+    def test_xss_onerror_with_spaces_and_case_variation(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.55",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/profile?name=%3CIMG%20SRC%3Dx%20ONERROR%20%3D%20alert(1)%3E",
+        }
+
+        alerts = detect_xss([event])
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["type"], "XSS")
+        self.assertEqual(alerts[0]["severity"], "HIGH")
+        self.assertEqual(alerts[0]["source_ip"], "192.168.1.55")
+
+    def test_xss_onerror_with_html_comment(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.56",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/profile?name=%3Cimg%20src%3Dx%20onerror%2F%2A%2A%2F%3Dalert(1)%3E",
+        }
+
+        alerts = detect_xss([event])
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["type"], "XSS")
+        self.assertEqual(alerts[0]["severity"], "HIGH")
+        self.assertEqual(alerts[0]["source_ip"], "192.168.1.56")
+
+    def test_path_traversal_windows_style(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.57",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/download?file=..%5C..%5C..%5C..%5CWindows%5CSystem32",
+        }
+
+        alerts = detect_path_traversal([event])
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["type"], "PATH_TRAVERSAL")
+        self.assertEqual(alerts[0]["severity"], "HIGH")
+        self.assertEqual(alerts[0]["source_ip"], "192.168.1.57")
+
+    def test_path_traversal_mixed_encoding(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.58",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/download?file=..%2F..%2F..%2Fetc/passwd",
+        }
+
+        alerts = detect_path_traversal([event])
+
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0]["type"], "PATH_TRAVERSAL")
+        self.assertEqual(alerts[0]["severity"], "HIGH")
+        self.assertEqual(alerts[0]["source_ip"], "192.168.1.58")
+
+    def test_sql_injection_does_not_flag_legitimate_query(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.59",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/products?id=123&sort=price",
+        }
+
+        alerts = detect_sql_injection([event])
+
+        self.assertEqual(len(alerts), 0)
+
+    def test_xss_does_not_flag_legitimate_search(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.60",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/search?q=hello+world",
+        }
+
+        alerts = detect_xss([event])
+
+        self.assertEqual(len(alerts), 0)
+
+    def test_path_traversal_does_not_flag_legitimate_file(self):
+        event = {
+            "type": "WEB",
+            "source_ip": "192.168.1.61",
+            "timestamp": datetime(2026, 8, 10, 10, 0, 0),
+            "path": "/download?file=report.pdf",
+        }
+
+        alerts = detect_path_traversal([event])
+
+        self.assertEqual(len(alerts), 0)
+
 if __name__ == "__main__":
     unittest.main()

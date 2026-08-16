@@ -16,6 +16,18 @@ def normalize_url(value, max_decodes=3):
 
     return current
 
+def normalize_xss_input(value):
+    value = normalize_url(value)
+
+    value = re.sub(
+        r"/\*.*?\*/",
+        "",
+        value,
+        flags=re.DOTALL
+    )
+
+    return value
+
 def detect_brute_force(events, threshold=10, window_seconds=60):
     failures_by_ip = defaultdict(list)
 
@@ -82,7 +94,8 @@ def detect_xss(events):
     return detect_web_patterns(
         events,
         xss_patterns,
-        "XSS"
+        "XSS",
+        normalizer=normalize_xss_input
     )
 
 def detect_path_traversal(events):
@@ -100,14 +113,14 @@ def detect_path_traversal(events):
         "PATH_TRAVERSAL"
     )
 
-def detect_web_patterns(events, patterns, alert_type, severity="HIGH"):
+def detect_web_patterns(events, patterns, alert_type, severity="HIGH", normalizer=normalize_url):
     alerts = []
 
     for event in events:
         if event["type"] != "WEB":
             continue
 
-        decoded_path = normalize_url(event["path"])
+        decoded_path = normalizer(event["path"])
 
         for pattern in patterns:
             if re.search(pattern, decoded_path, re.IGNORECASE):
