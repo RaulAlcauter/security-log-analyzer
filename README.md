@@ -365,6 +365,19 @@ Example:
       192.168.1.36        : 1
     ============================================================
 
+### JSON Output
+
+Alerts can be exported in JSON format:
+
+    python3 src/analyzer.py --format json
+
+Custom log and configuration paths can also be provided:
+
+    python3 src/analyzer.py \
+        --access-log logs/access.log \
+        --auth-log logs/auth.log \
+        --config config/rules.json
+
 ---
 
 ## Example Alert Output
